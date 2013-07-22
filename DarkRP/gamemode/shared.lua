@@ -33,7 +33,70 @@ TEAM_CITIZEN = AddExtraTeam("Citizen", {
 	mayorCanSetSalary = true
 })
 
-TEAM_POLICE = AddExtraTeam("Civil Protection", {
+TEAM_CHIEF = AddExtraTeam("Police Chief", {
+	color = Color(20, 20, 255, 255),
+	model = "models/player/combine_soldier_prisonguard.mdl",
+	description = [[The Chief is the leader of the Civil Protection unit.
+		Coordinate the police forces to bring law to the city
+		Hit them with arrest baton to put them in jail
+		Bash them with a stunstick and they might learn better than to
+		disobey the law.
+		The Battering Ram can break down the door of a criminal with a
+		warrant for his/her arrest.
+		Type /wanted <name> to alert the public to this criminal
+		Type /jailpos to set the Jail Position]],
+	weapons = {"arrest_stick", "unarrest_stick", "weapon_deagle2", "stunstick", "door_ram", "weaponchecker"},
+	command = "chief",
+	max = 1,
+	salary = 75,
+	admin = 0,
+	vote = false,
+	hasLicense = true,
+	chief = true,
+	NeedToChangeFrom = TEAM_POLICE,
+	help = {
+		"Please don't abuse your job",
+		"When you arrest someone they are auto transported to jail.",
+		"They are auto let out of jail after some time",
+		"Type /warrant [Nick|SteamID|Status ID] to set a search warrant for a player.",
+		"Type /wanted [Nick|SteamID|Status ID] to alert everyone to a wanted suspect",
+		"Type /unwanted [Nick|SteamID|Status ID] to clear the suspect",
+		"Type /jailpos to set the jail position"
+	}
+})
+
+TEAM_MAYOR = AddExtraTeam("Mayor", {
+	color = Color(150, 20, 20, 255),
+	model = "models/player/breen.mdl",
+	description = [[The Mayor of the city creates laws to serve the greater good
+	of the people.
+	If you are the mayor you may create and accept warrants.
+	Type /wanted <name>  to warrant a player
+	Type /jailpos to set the Jail Position
+	Type /lockdown initiate a lockdown of the city.
+	Everyone must be inside during a lockdown.
+	The cops patrol the area
+	/unlockdown to end a lockdown]],
+	weapons = {},
+	command = "mayor",
+	max = 1,
+	salary = 85,
+	admin = 0,
+	vote = true,
+	hasLicense = false,
+	mayor = true,
+	help = {
+		"Type /warrant [Nick|SteamID|Status ID] to set a search warrant for a player.",
+		"Type /wanted [Nick|SteamID|Status ID] to alert everyone to a wanted suspect.",
+		"Type /unwanted [Nick|SteamID|Status ID] to clear the suspect.",
+		"Type /lockdown to initiate a lockdown",
+		"Type /unlockdown to end a lockdown",
+		"Type /placelaws to place a screen containing the laws.",
+		"Type /addlaw and /removelaw to edit the laws."
+	}
+})
+
+TEAM_POLICE = AddExtraTeam("Police Officer", {
 	color = Color(25, 25, 170, 255),
 	model = {"models/player/police.mdl", "models/player/police_fem.mdl"},
 	description = [[The protector of every citizen that lives in the city .
@@ -156,69 +219,6 @@ TEAM_MEDIC = AddExtraTeam("Medic", {
 	mayorCanSetSalary = true
 })
 
-TEAM_CHIEF = AddExtraTeam("Civil Protection Chief", {
-	color = Color(20, 20, 255, 255),
-	model = "models/player/combine_soldier_prisonguard.mdl",
-	description = [[The Chief is the leader of the Civil Protection unit.
-		Coordinate the police forces to bring law to the city
-		Hit them with arrest baton to put them in jail
-		Bash them with a stunstick and they might learn better than to
-		disobey the law.
-		The Battering Ram can break down the door of a criminal with a
-		warrant for his/her arrest.
-		Type /wanted <name> to alert the public to this criminal
-		Type /jailpos to set the Jail Position]],
-	weapons = {"arrest_stick", "unarrest_stick", "weapon_deagle2", "stunstick", "door_ram", "weaponchecker"},
-	command = "chief",
-	max = 1,
-	salary = 75,
-	admin = 0,
-	vote = false,
-	hasLicense = true,
-	chief = true,
-	NeedToChangeFrom = TEAM_POLICE,
-	help = {
-		"Please don't abuse your job",
-		"When you arrest someone they are auto transported to jail.",
-		"They are auto let out of jail after some time",
-		"Type /warrant [Nick|SteamID|Status ID] to set a search warrant for a player.",
-		"Type /wanted [Nick|SteamID|Status ID] to alert everyone to a wanted suspect",
-		"Type /unwanted [Nick|SteamID|Status ID] to clear the suspect",
-		"Type /jailpos to set the jail position"
-	}
-})
-
-TEAM_MAYOR = AddExtraTeam("Mayor", {
-	color = Color(150, 20, 20, 255),
-	model = "models/player/breen.mdl",
-	description = [[The Mayor of the city creates laws to serve the greater good
-	of the people.
-	If you are the mayor you may create and accept warrants.
-	Type /wanted <name>  to warrant a player
-	Type /jailpos to set the Jail Position
-	Type /lockdown initiate a lockdown of the city.
-	Everyone must be inside during a lockdown.
-	The cops patrol the area
-	/unlockdown to end a lockdown]],
-	weapons = {},
-	command = "mayor",
-	max = 1,
-	salary = 85,
-	admin = 0,
-	vote = true,
-	hasLicense = false,
-	mayor = true,
-	help = {
-		"Type /warrant [Nick|SteamID|Status ID] to set a search warrant for a player.",
-		"Type /wanted [Nick|SteamID|Status ID] to alert everyone to a wanted suspect.",
-		"Type /unwanted [Nick|SteamID|Status ID] to clear the suspect.",
-		"Type /lockdown to initiate a lockdown",
-		"Type /unlockdown to end a lockdown",
-		"Type /placelaws to place a screen containing the laws.",
-		"Type /addlaw and /removelaw to edit the laws."
-	}
-})
-
 TEAM_HOBO = AddExtraTeam("Hobo", {
 	color = Color(80, 45, 0, 255),
 	model = "models/player/corpse1.mdl",
@@ -239,6 +239,7 @@ TEAM_HOBO = AddExtraTeam("Hobo", {
 	hobo = true,
 	mayorCanSetSalary = false
 })
+
 
 //ADD CUSTOM TEAMS UNDER THIS LINE:
 
@@ -261,8 +262,7 @@ WARNING: THE DOOR GROUPS HAVE TO BE UNDER THE TEAMS IN SHARED.LUA. IF THEY ARE N
 
 The default door groups, can also be used as examples:
 */
-AddDoorGroup("Cops and Mayor only", TEAM_CHIEF, TEAM_POLICE, TEAM_MAYOR)
-AddDoorGroup("Gundealer only", TEAM_GUN)
+AddDoorGroup("Government Door", TEAM_CHIEF, TEAM_POLICE, TEAM_MAYOR)
 
 
 /*
@@ -276,7 +276,7 @@ WARNING: THE AGENDAS HAVE TO BE UNDER THE TEAMS IN SHARED.LUA. IF THEY ARE NOT, 
 The default agenda's, can also be used as examples:
 */
 AddAgenda("Gangster's agenda", TEAM_MOB, {TEAM_GANG})
-AddAgenda("Police agenda", TEAM_MAYOR, {TEAM_CHIEF, TEAM_POLICE})
+AddAgenda("Government agenda", TEAM_MAYOR, {TEAM_CHIEF, TEAM_POLICE})
 
 
 /*
