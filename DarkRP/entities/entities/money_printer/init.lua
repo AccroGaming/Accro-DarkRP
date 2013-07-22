@@ -17,11 +17,11 @@ function ENT:Initialize()
 	self.sparking = false
 	self.damage = 100
 	self.IsMoneyPrinter = true
-	timer.Simple(math.random(100, 350), function() PrintMore(self) end)
+	timer.Simple(math.random(45, 200), function() PrintMore(self) end)
 
-	self.sound = CreateSound(self, Sound("ambient/levels/labs/equipment_printer_loop1.wav"))
+	/*self.sound = CreateSound(self, Sound("ambient/levels/labs/equipment_printer_loop1.wav")) -- Playing a sound all the time. Remove the /* and the */ to enable it
 	self.sound:SetSoundLevel(52)
-	self.sound:PlayEx(1, 100)
+	self.sound:PlayEx(1, 100)*/
 end
 
 function ENT:OnTakeDamage(dmg)
