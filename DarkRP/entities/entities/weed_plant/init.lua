@@ -3,7 +3,7 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 
 function ENT:Initialize()
-self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+self.Entity:SetModel("models/nater/weedplant_pot.mdl")
 self.Entity:PhysicsInit(SOLID_VPHYSICS)
 self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 self.Entity:SetSolid(SOLID_VPHYSICS)
@@ -36,9 +36,9 @@ function ENT:Use()
 	if self.Entity:GetNWBool("Usable") == true then
 		self.Entity:SetNWBool("Usable", false)
 		self.Entity:SetNWBool("Plantable", true)
-		self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+		self.Entity:SetModel("models/nater/weedplant_pot_dirt.mdl")
 		local SpawnPos = self.Entity:GetPos()
-		local WeedBag = ents.Create("seed_weed")
+		local WeedBag = ents.Create("durgz_weed")
 		WeedBag:SetPos(SpawnPos + Vector(0,0,15))
 		WeedBag:Spawn()
 	end
@@ -46,8 +46,7 @@ end
 
 function ENT:Touch(hitEnt)
 
-	if hitEnt:GetClass() == "oil" then
-
+	if hitEnt:GetClass() == "seed_weed" then
 		
 		if self.Entity:GetNWBool("Plantable") == true then
 			
@@ -55,34 +54,34 @@ function ENT:Touch(hitEnt)
 			
 			hitEnt:Remove()
 			
-			self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			self.Entity:SetModel("models/nater/weedplant_pot_planted.mdl")
 			
-			timer.Create("Stage2_"..self:EntIndex(), 1, 1, function()
-				self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			timer.Create("Stage2_"..self:EntIndex(), 50, 1, function()
+				self.Entity:SetModel("models/nater/weedplant_pot_growing1.mdl")
 			end)
 
-			timer.Create("Stage3_"..self:EntIndex(), 2, 1, function()
-				self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			timer.Create("Stage3_"..self:EntIndex(), 100, 1, function()
+				self.Entity:SetModel("models/nater/weedplant_pot_growing2.mdl")
 			end)
 
-			timer.Create("Stage4_"..self:EntIndex(), 3, 1, function()
-				self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			timer.Create("Stage4_"..self:EntIndex(), 150, 1, function()
+				self.Entity:SetModel("models/nater/weedplant_pot_growing3.mdl")
 			end)
 
-			timer.Create("Stage5_"..self:EntIndex(), 4, 1, function()
-				self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			timer.Create("Stage5_"..self:EntIndex(), 200, 1, function()
+				self.Entity:SetModel("models/nater/weedplant_pot_growing4.mdl")
 			end)
 
-			timer.Create("Stage6_"..self:EntIndex(), 5, 1, function()
-				self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			timer.Create("Stage6_"..self:EntIndex(), 250, 1, function()
+				self.Entity:SetModel("models/nater/weedplant_pot_growing5.mdl")
 			end)
 
-			timer.Create("Stage7_"..self:EntIndex(), 6, 1, function()
-				self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			timer.Create("Stage7_"..self:EntIndex(), 300, 1, function()
+				self.Entity:SetModel("models/nater/weedplant_pot_growing6.mdl")
 			end)
 
-			timer.Create("Stage8_"..self:EntIndex(), 7, 1, function()
-				self.Entity:SetModel("models/props_lab/crematorcase.mdl")
+			timer.Create("Stage8_"..self:EntIndex(), 350, 1, function()
+				self.Entity:SetModel("models/nater/weedplant_pot_growing7.mdl")
 				self.Entity:SetNWBool("Usable", true)
 			end)
 

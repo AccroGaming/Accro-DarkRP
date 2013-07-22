@@ -1,7 +1,7 @@
 ENT.Type = "anim"
 ENT.Base = "base_gmodentity"
 ENT.PrintName = "Drug Lab"
-ENT.Author = "Rickster"
+ENT.Author = "Edited by: Samuel"
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
 

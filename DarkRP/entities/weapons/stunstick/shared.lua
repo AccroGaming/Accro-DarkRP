@@ -13,7 +13,7 @@ end
 SWEP.Base = "weapon_cs_base2"
 
 SWEP.Author = "Rick Darkaliono, philxyz"
-SWEP.Instructions = "Left click to discipline, right click to hurt the target"
+SWEP.Instructions = "Left click to discipline, right click to kill"
 SWEP.Contact = ""
 SWEP.Purpose = ""
 SWEP.IconLetter = ""
@@ -44,7 +44,7 @@ SWEP.Secondary.Ammo = ""
 
 function SWEP:Deploy()
 	if CLIENT or not IsValid(self:GetOwner()) then return end
-	--self:SetColor(Color(0,0,255,255)) -- Swep color
+	self:SetColor(Color(0,0,255,255))
 	self:SetMaterial("models/shiny")
 	SendUserMessage("StunStickColour", self:GetOwner(), 0,0,255, "models/shiny")
 	return true
