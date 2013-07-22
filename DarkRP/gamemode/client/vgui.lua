@@ -1272,116 +1272,117 @@ local VoteVGUI = {}
         end
         local dialog
         local function KeysMenu(um)
-                if dialog and dialog:IsValid() then return end
-                local trace = LocalPlayer():GetEyeTraceNoCursor()
-                if !trace or !trace.Entity or !trace.Entity:IsValid() then return end
-                local Vehicle = um:ReadBool()
-                dialog = CreateButtonDialog()
-         
-                local DisplayType = Vehicle and "vehicle" or "door"
-         
-                local _RunCmd = RunCmd
-                local function RunCmd(...)
-                        _RunCmd(...)
-                        if ValidPanel(dialog) then
-                                dialog:Remove()
+        if dialog and dialog:IsValid() then return end
+        local trace = LocalPlayer():GetEyeTraceNoCursor()
+        if !trace or !trace.Entity or !trace.Entity:IsValid() then return end
+        ---local Vehicle = um:ReadBool()
+        dialog = CreateButtonDialog()
+ 
+        local DisplayType = Vehicle and "vehicle" or "door"
+ 
+        local _RunCmd = RunCmd
+        local function RunCmd(...)
+                _RunCmd(...)
+                if ValidPanel(dialog) then
+                        dialog:Remove()
+                end
+        end
+        local function EditDoorGroup()
+                local menu = DermaMenu()
+                local groups = menu:AddSubMenu("Door Groups")
+                local teams = menu:AddSubMenu("Jobs")
+                local add = teams:AddSubMenu("Add")
+                local remov = teams:AddSubMenu("Remove")
+ 
+                menu:AddOption("None", function() RunCmd("/togglegroupownable") end)
+                for k,v in pairs(RPExtraTeamDoors) do
+                        groups:AddOption(k, function() RunCmd("/togglegroupownable",k) end)
+                end
+ 
+                if not trace.Entity.DoorData then return end
+ 
+                for k,v in pairs(RPExtraTeams) do
+                        if not trace.Entity.DoorData.TeamOwn or not trace.Entity.DoorData.TeamOwn[k] then
+                                add:AddOption( v.name, function() RunCmd("/toggleteamownable",k) end )
+                        else
+                                remove:AddOption( v.name, function() RunCmd("/toggleteamownable",k) end )
                         end
                 end
-                local function EditDoorGroup()
-                        local menu = DermaMenu()
-                        local groups = menu:AddSubMenu("Door Groups")
-                        local teams = menu:AddSubMenu("Jobs")
-                        local add = teams:AddSubMenu("Add")
-                        local remove = teams:AddSubMenu("Remove")
-         
-                        menu:AddOption("None", function() RunCmd("/togglegroupownable") end)
-                        for k,v in pairs(RPExtraTeamDoors) do
-                                groups:AddOption(k, function() RunCmd("/togglegroupownable",k) end)
-                        end
-         
-                        if not trace.Entity.DoorData then return end
-         
-                        for k,v in pairs(RPExtraTeams) do
-                                if not trace.Entity.DoorData.TeamOwn or not trace.Entity.DoorData.TeamOwn[k] then
-                                        add:AddOption( v.name, function() RunCmd("/toggleteamownable",k) end )
-                                else
-                                        remove:AddOption( v.name, function() RunCmd("/toggleteamownable",k) end )
-                                end
-                        end
-         
-                        menu:Open()
-                end
-                local function EditDoorTitle()
-                        Derma_StringRequest("Set door title", "Set the title of the "..DisplayType.." you're looking at", "", function(text)
-                                RunCmd("/title",text)
-                        end, function() end, "Ok", "Cancel")
-                end
-         
-                if trace.Entity:OwnedBy(LocalPlayer()) then
-                        if trace.Entity:IsMasterOwner(LocalPlayer()) then
-                                dialog:AddItem(CreateButton(1,'Sell '..DisplayType,'icon16/money_add.png',function()RunCmd("/toggleown")end))
-                                dialog:AddItem(CreateButton(1,'Add owner','icon16/user_add.png',function()
-                                        local menu = DermaMenu()
-                                        menu.found = false
-                                        for k,v in pairs(player.GetAll()) do
-                                                if not trace.Entity:OwnedBy(v) and not trace.Entity:AllowedToOwn(v) then
-                                                        menu.found = true
-                                                        menu:AddOption(v:Nick(), function() RunCmd("/ao ", v:UserID()) end)
-                                                end
-                                        end
-                                        if not menu.found then
-                                                menu:AddOption("Noone available", function() end)
-                                        end
-                                        menu:Open() end))
-                                dialog:AddItem(CreateButton(1,'Remove owner','icon16/user_delete.png',function()
+ 
+                menu:Open()
+        end
+        local function EditDoorTitle()
+                Derma_StringRequest("Set door title", "Set the title of the "..DisplayType.." you're looking at", "", function(text)
+                        RunCmd("/title",text)
+                end, function() end, "Ok", "Cancel")
+        end
+ 
+        if trace.Entity:OwnedBy(LocalPlayer()) then
+                if trace.Entity:IsMasterOwner(LocalPlayer()) then
+                        dialog:AddItem(CreateButton(1,'Sell '..DisplayType,'icon16/money_add.png',function()RunCmd("/toggleown")end))
+                        dialog:AddItem(CreateButton(1,'Add owner','icon16/user_add.png',function()
                                 local menu = DermaMenu()
+                                menu.found = false
                                 for k,v in pairs(player.GetAll()) do
-                                        if (trace.Entity:OwnedBy(v) and not trace.Entity:IsMasterOwner(v)) or trace.Entity:AllowedToOwn(v) then
+                                        if not trace.Entity:OwnedBy(v) and not trace.Entity:AllowedToOwn(v) then
                                                 menu.found = true
-                                                menu:AddOption(v:Nick(), function() RunCmd("/ro",v:UserID()) end)
+                                                menu:AddOption(v:Nick(), function() RunCmd("/ao ", v:UserID()) end)
                                         end
                                 end
                                 if not menu.found then
                                         menu:AddOption("Noone available", function() end)
                                 end
                                 menu:Open() end))
-                        else
-                                dialog:AddItem(CreateButton(1,'Unown '..DisplayType,'icon16/money_add.png',function()RunCmd("/toggleown")end))
-                        end
-                        dialog:AddItem(CreateButton(1,'Set '..DisplayType..' title','icon16/note_edit.png',EditDoorTitle))
-                        if LocalPlayer():IsSuperAdmin() and not Vehicle then
-                                dialog:AddItem(CreateButton(1,'Edit '..DisplayType..' group','icon16/group_edit.png',EditDoorGroup))
-                        end
-                elseif not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:IsOwnable() and not trace.Entity:IsOwned() and not trace.Entity.DoorData.NonOwnable then
-                        if LocalPlayer():IsSuperAdmin() then
-                                if not trace.Entity.DoorData.GroupOwn then
-                                        dialog:AddItem(CreateButton(1,'Purchase '..DisplayType,'icon16/money_delete.png',function()RunCmd("/toggleown")end))
+                        dialog:AddItem(CreateButton(1,'Remove owner','icon16/user_delete.png',function()
+                        local menu = DermaMenu()
+                        for k,v in pairs(player.GetAll()) do
+                                if (trace.Entity:OwnedBy(v) and not trace.Entity:IsMasterOwner(v)) or trace.Entity:AllowedToOwn(v) then
+                                        menu.found = true
+                                        menu:AddOption(v:Nick(), function() RunCmd("/ro",v:UserID()) end)
                                 end
-                                dialog:AddItem(CreateButton(1,'Disable ownership','icon16/cancel.png',function()RunCmd("/toggleownable")end))
-                                dialog:AddItem(CreateButton(1,'Edit '..DisplayType..' group','icon16/group_edit.png',EditDoorGroup))  
-                        elseif not trace.Entity.DoorData.GroupOwn then
-                                RunCmd("/toggleown")
-                        else
-                                dialog:Remove()
                         end
-                elseif not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:AllowedToOwn(LocalPlayer()) then
-                        if LocalPlayer():IsSuperAdmin() then
-                                dialog:AddItem(CreateButton(1,'Co-own '..DisplayType,'icon16/money_delete.png',function()RunCmd("/toggleown")end))
-                                dialog:AddItem(CreateButton(1,'Edit '..DisplayType..' group','icon16/group_edit.png',EditDoorGroup))  
-                        elseif not trace.Entity.DoorData.GroupOwn then
-                                RunCmd("/toggleown")
-                                dialog:Remove()
+                        if not menu.found then
+                                menu:AddOption("Noone available", function() end)
                         end
-                elseif LocalPlayer():IsSuperAdmin() and trace.Entity.DoorData.NonOwnable then
-                        dialog:AddItem(CreateButton(1,'Enable ownership','icon16/accept.png',function() RunCmd("/toggleownable") end))
-                        dialog:AddItem(CreateButton(1,'Set '..DisplayType..' title','icon16/note_edit.png',EditDoorTitle))
-                elseif LocalPlayer():IsSuperAdmin() and not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:IsOwned() and not trace.Entity:AllowedToOwn(LocalPlayer()) then
-                        dialog:AddItem(CreateButton(1,'Disable ownership','icon16/cancel.png',function() RunCmd("/toggleownable") end))
-                        dialog:AddItem(CreateButton(1,'Set '..DisplayType..' title','icon16/note_edit.png',EditDoorTitle))
+                        menu:Open() end))
+                else
+                        dialog:AddItem(CreateButton(1,'Unown '..DisplayType,'icon16/money_add.png',function()RunCmd("/toggleown")end))
+                end
+                dialog:AddItem(CreateButton(1,'Set '..DisplayType..' title','icon16/note_edit.png',EditDoorTitle))
+                if LocalPlayer():IsSuperAdmin() and not Vehicle then
                         dialog:AddItem(CreateButton(1,'Edit '..DisplayType..' group','icon16/group_edit.png',EditDoorGroup))
+                end
+        elseif not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:IsOwnable() and not trace.Entity:IsOwned() and not trace.Entity.DoorData.NonOwnable then
+                if LocalPlayer():IsSuperAdmin() then
+                        if not trace.Entity.DoorData.GroupOwn then
+                                dialog:AddItem(CreateButton(1,'Purchase '..DisplayType,'icon16/money_delete.png',function()RunCmd("/toggleown")end))
+                        end
+                        dialog:AddItem(CreateButton(1,'Disable ownership','icon16/cancel.png',function()RunCmd("/toggleownable")end))
+                        dialog:AddItem(CreateButton(1,'Edit '..DisplayType..' group','icon16/group_edit.png',EditDoorGroup))  
+                elseif not trace.Entity.DoorData.GroupOwn then
+                        RunCmd("/toggleown")
                 else
                         dialog:Remove()
                 end
+        elseif not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:AllowedToOwn(LocalPlayer()) then
+                if LocalPlayer():IsSuperAdmin() then
+                        dialog:AddItem(CreateButton(1,'Co-own '..DisplayType,'icon16/money_delete.png',function()RunCmd("/toggleown")end))
+                        dialog:AddItem(CreateButton(1,'Edit '..DisplayType..' group','icon16/group_edit.png',EditDoorGroup))  
+                elseif not trace.Entity.DoorData.GroupOwn then
+                        RunCmd("/toggleown")
+                        dialog:Remove()
+                end
+        elseif LocalPlayer():IsSuperAdmin() and trace.Entity.DoorData.NonOwnable then
+                dialog:AddItem(CreateButton(1,'Enable ownership','icon16/accept.png',function() RunCmd("/toggleownable") end))
+                dialog:AddItem(CreateButton(1,'Set '..DisplayType..' title','icon16/note_edit.png',EditDoorTitle))
+        elseif LocalPlayer():IsSuperAdmin() and not trace.Entity:OwnedBy(LocalPlayer()) and trace.Entity:IsOwned() and not trace.Entity:AllowedToOwn(LocalPlayer()) then
+                dialog:AddItem(CreateButton(1,'Disable ownership','icon16/cancel.png',function() RunCmd("/toggleownable") end))
+                dialog:AddItem(CreateButton(1,'Set '..DisplayType..' title','icon16/note_edit.png',EditDoorTitle))
+                dialog:AddItem(CreateButton(1,'Edit '..DisplayType..' group','icon16/group_edit.png',EditDoorGroup))
+        else
+                dialog:Remove()
         end
-        usermessage.Hook("KeysMenu", KeysMenu)
+end
+GM.ShowTeam = KeysMenu
+usermessage.Hook("KeysMenu", KeysMenu)
 
