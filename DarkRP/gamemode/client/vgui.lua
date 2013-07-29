@@ -23,8 +23,8 @@ local VoteVGUI = {}
                         timeleft = 100
                 end
                 local OldTime = CurTime()
-                if string.find(voteid, LocalPlayer():EntIndex()) then return end --If it's about you then go away
-                if not IsValid(LocalPlayer()) then return end -- Sent right before player initialisation
+                if string.find(voteid, LocalPlayer():EntIndex()) then return end
+                if not IsValid(LocalPlayer()) then return end
                
                 VoteQueues[voteid] = table.Count(VoteQueues) + 1
          
@@ -101,7 +101,7 @@ local VoteVGUI = {}
                 label:SetText(name)
                 label:SizeToContents()
                 label:SetWide(panel:GetWide() - 30)
-                -- label:A()
+
                 label:SetVisible(true)
                
                 local label1 = vgui.Create("DLabel")
