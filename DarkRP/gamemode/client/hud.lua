@@ -231,6 +231,8 @@ if (ply:Alive()) then
 	surface.SetDrawColor(255,255,255,255)
 	draw.SimpleText("Ping: "..ply:Ping(),"Chatfont",10,ScrH() - 70)
 
+
+	
 	draw.RoundedBox(0,10,ScrH() - 35,150,20,Color(0,0,0,200))
 	draw.RoundedBox(0,12,ScrH() - 33,math.Clamp(hp,0,100)*1.46,16,Color(127,0,0,200))
 	draw.SimpleText("Health: "..hp,"TargetID",46,ScrH() - 33)
