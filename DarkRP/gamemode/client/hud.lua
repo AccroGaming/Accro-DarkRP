@@ -1,13 +1,11 @@
-/*-----------------------------------
-Accro Gaming Version 5.0
------------------------------------*/
-
 /*---------------------------------------------------------------------------
 HUD ConVars
 ---------------------------------------------------------------------------*/
 local ConVars = {}
 local HUDWidth
 local HUDHeight
+
+local CUR = "$"
 
 CreateClientConVar("weaponhud", 0, true, false)
 
@@ -69,11 +67,11 @@ HUD Seperate Elements
 ---------------------------------------------------------------------------*/
 local function DrawInfo()
 	LocalPlayer().DarkRPVars = LocalPlayer().DarkRPVars or {}
-	local Salary = 	"Salary" .. CUR .. (LocalPlayer().DarkRPVars.salary or 0)
+	local Salary = 	LANGUAGE.salary .. CUR .. (LocalPlayer().DarkRPVars.salary or 0)
 
 	local JobWallet =
-	"Job" .. (LocalPlayer().DarkRPVars.job or "") .. "\n"..
-	"Wallet" .. CUR .. (formatNumber(LocalPlayer().DarkRPVars.money) or 0)
+	LANGUAGE.job .. (LocalPlayer().DarkRPVars.job or "") .. "\n"..
+	LANGUAGE.wallet .. CUR .. (formatNumber(LocalPlayer().DarkRPVars.money) or 0)
 
 	local wep = LocalPlayer( ):GetActiveWeapon( );
 
@@ -230,8 +228,6 @@ if (ply:Alive()) then
 			surface.SetMaterial(banii)
 	surface.SetDrawColor(255,255,255,255)
 	draw.SimpleText("Ping: "..ply:Ping(),"Chatfont",10,ScrH() - 70)
-
-
 	
 	draw.RoundedBox(0,10,ScrH() - 35,150,20,Color(0,0,0,200))
 	draw.RoundedBox(0,12,ScrH() - 33,math.Clamp(hp,0,100)*1.46,16,Color(127,0,0,200))
@@ -269,9 +265,9 @@ Entity HUDPaint things
 local function DrawPlayerInfo(ply)
 	local pos = ply:EyePos()
 
-	pos.z = pos.z + 10
+	pos.z = pos.z + 10 -- The position we want is a bit above the position of the eyes
 	pos = pos:ToScreen()
-	pos.y = pos.y - 50
+	pos.y = pos.y - 50 -- Move the text up a few pixels to compensate for the height of the text
 
 	if GAMEMODE.Config.showname and not ply.DarkRPVars.wanted then
 		draw.DrawText(ply:Nick(), "DarkRPHUD2", pos.x + 1, pos.y + 1, Color(0, 0, 0, 255), 1)
@@ -311,6 +307,202 @@ local function DrawWantedInfo(ply)
 	draw.DrawText(LANGUAGE.wanted.."\nReason: "..tostring(ply.DarkRPVars["wantedReason"]), "DarkRPHUD2", pos.x + 1, pos.y - 41, Color(255, 0, 0, 255), 1)
 end
 
+-------- Door Hud Start --------
+
+
+
+
+hook.Add("PostDrawOpaqueRenderables", "PaintHook", function()
+	local tr = LocalPlayer():GetEyeTrace()
+	local Pos = tr.Entity:GetPos()
+	local GetAngles = tr.Entity:GetAngles()
+	local DoorClass = tr.Entity:GetClass()
+	local text1 = "Owned by:"
+	local text2 = tr.Entity:GetNWInt("OwnerOfDoor")
+	local text3 = "Health ".. tr.Entity:GetNWInt("OwnerOfDoorHealth") .."%"
+	local text3info = tr.Entity:GetNWInt("OwnerOfDoorHealth")
+	local text4 = "Door is broken. Contact Locksmith"
+	
+	surface.SetFont("DarkRPHUD2")
+	local TextWidth2 = surface.GetTextSize(tr.Entity:GetNWInt("OwnerOfDoor"))
+	local TextWidth3 = surface.GetTextSize("Health ".. tr.Entity:GetNWInt("OwnerOfDoorHealth") .."%")
+	local TextWidth4 = surface.GetTextSize("Door is broken. Contact Locksmith")
+	
+	local text = tr.Entity:GetNWInt("OwnerOfDoor")
+	
+	if DoorClass == "prop_door_rotating" then
+		GetAngles:RotateAroundAxis(GetAngles:Up(), 270)
+		local TextAng = GetAngles
+		TextAng:RotateAroundAxis(TextAng:Forward() * 1, 90)
+		cam.Start3D2D(Pos + GetAngles:Up() * 1.25, TextAng, 0.1)
+			draw.RoundedBox(4, -400, -200, 345, 145, Color(0, 0, 0, 200))	
+			draw.RoundedBox(4, -390, -115, 325, 50, Color(0, 0, 0, 125))
+			draw.WordBox(2, -275, -180, text1, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			draw.WordBox(2, (-232) -TextWidth2*0.5, -150, text2, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			if(tr.Entity:GetNWInt("OwnerOfDoorHealth") > 0)then
+				draw.RoundedBox(4, -385, -110, 315 * text3info / 100, 40, Color(0, 127, 31, 200))
+				draw.WordBox(2, (-232) -TextWidth3*0.5, -102, text3, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			else
+				draw.RoundedBox(4, -385, -110, 315, 40, Color(217, 0, 0, 200))
+				draw.WordBox(2, (-232) -TextWidth4*0.5, -102, text4, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			end
+		cam.End3D2D()
+		
+		GetAngles:RotateAroundAxis(GetAngles:Right(), 180)
+		local TextAng = GetAngles
+		TextAng:RotateAroundAxis(TextAng:Forward() * 1, 0)
+		cam.Start3D2D(Pos + GetAngles:Up() * 1.25, TextAng, 0.1)
+			draw.RoundedBox(4, 55, -200, 345, 145, Color(0, 0, 0, 200))	
+			draw.RoundedBox(4, 65, -115, 325, 50, Color(0, 0, 0, 125))
+			draw.WordBox(2, (227) -TextWidth2*0.5, -150, text2, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			draw.WordBox(2, 185, -180, text1, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			
+			if(tr.Entity:GetNWInt("OwnerOfDoorHealth") > 0)then
+				draw.RoundedBox(4, 70, -110, 315 * text3info / 100, 40, Color(0, 127, 31, 200))
+				draw.WordBox(2, (227) -TextWidth3*0.5, -102, text3, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			else
+				draw.RoundedBox(4, 70, -110, 315, 40, Color(217, 0, 0, 200))
+				draw.WordBox(2, (227) -TextWidth4*0.5, -102, text4, "DarkRPHUD2", Color(0, 0, 0, 0), Color(255,255,255,255))
+			end
+		cam.End3D2D()
+	end
+	
+		 ---1st Line---
+local Pos1 = Vector(-2690,-790,135)
+local Pos5 = Vector(-110, 414, 105)
+local Pos9 = Vector(325, 4218, 55)
+local Pos13 = Vector(2645, -2443, 95)
+local Pos17 = Vector(180, -623, 85)
+local Text5 = "Welcome to Accro-Gaming"
+
+
+    ---2nd Line---
+local Pos2 = Vector(-2715,-790,120)
+local Pos6 = Vector(-87, 414, 90)
+local Pos10 = Vector(300, 4218, 40)
+local Pos14 = Vector(2670, -2443, 80)
+local Pos18 = Vector(155, -623, 70)
+local Text6 = "Sign up on our forum for more benefits"
+
+    ---3th Line---
+local Pos3 = Vector(-2685,-790,105)
+local Pos7 = Vector(-117, 414, 75)
+local Pos11 = Vector(330, 4218, 25)
+local Pos15 = Vector(2640, -2443, 65)
+local Pos19 = Vector(185, -623, 55)
+local Text7 = "www.accro-gaming.com"
+
+     ---4th line---
+local Pos4 = Vector(-2660,-790,90)
+local Pos8 = Vector(-145, 414, 60)
+local Pos12 = Vector(355, 4218, 10)
+local Pos16 = Vector(2615, -2443, 50)
+local Pos20 = Vector(210, -623, 40)
+local Text8 = "- The staff"
+
+    --- Fonts---
+local Font = "DarkRPHUD2"
+local Font1 = "DarkRPHUD2"
+
+
+     
+	 ---Angles---
+local Ang = Angle(0,0,90)
+local Ang2 = Angle(0,180,90)
+
+
+    ---Box---
+local TextWidth = surface.GetTextSize(""..Text5)
+
+	---Line 1---
+	cam.Start3D2D(Pos1, Ang, 0.5)
+	draw.WordBox(2, -TextWidth*0.5, -30, Text5, Font, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos5, Ang2, 0.5)
+	draw.WordBox(2, -TextWidth*0.5, -30, Text5, Font, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos9, Ang, 0.5)
+	draw.WordBox(2, -TextWidth*0.5, -30, Text5, Font, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos13, Ang2, 0.5)
+	draw.WordBox(2, -TextWidth*0.5, -30, Text5, Font, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos17, Ang, 0.5)
+	draw.WordBox(2, -TextWidth*0.5, -30, Text5, Font, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	---Line 2---
+	cam.Start3D2D(Pos2, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text6, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos6, Ang2, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text6, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos10, Ang, 0.5)
+	draw.WordBox(2, -TextWidth*0.5, -30, Text6, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos14, Ang2, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text6, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos18, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text6, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	---Line 3---
+	cam.Start3D2D(Pos3, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text7, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos7, Ang2, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text7, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos11, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text7, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos15, Ang2, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text7, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos19, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text7, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	---Line 4---
+	cam.Start3D2D(Pos4, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text8, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos8, Ang2, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text8, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos12, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text8, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos16, Ang2, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text8, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	cam.Start3D2D(Pos20, Ang, 0.5)	
+	draw.WordBox(2, -TextWidth*0.5, -30, Text8, Font1, Color(0, 100, 200, 100), Color(255,255,255,255))
+	cam.End3D2D()
+	
+	
+end)
+
+-------- Door Hud End --------
+
 /*---------------------------------------------------------------------------
 The Entity display: draw HUD information about entities
 ---------------------------------------------------------------------------*/
@@ -327,7 +519,7 @@ local function DrawEntityDisplay()
 
 		if GAMEMODE.Config.globalshow and ply ~= LocalPlayer() then
 			DrawPlayerInfo(ply)
-
+		-- Draw when you're (almost) looking at him
 		elseif not GAMEMODE.Config.globalshow and hisPos:Distance(shootPos) < 400 then
 			local pos = hisPos - shootPos
 			local unitPos = pos:GetNormalized()
@@ -371,3 +563,15 @@ function GM:HUDPaint()
 
 	self.BaseClass:HUDPaint()
 end
+/*---------------------------------------------------------------------------
+Draw dat cuztom shita! -Shriio!?!,-
+setpos 154.426468 -709.757568 18.397545;setang 19.712179 30.900398 0.000000
+---------------------------------------------------------------------------*/
+
+function DrawWorldHud()
+	cam.Start3D2D( Vector(-2890, -1450, -140), Angle(0, 0, 0), 1 )
+		draw.WordBox(0, 0, 0, "test", "HUDNumber5", Color(0, 0, 0, 0), Color(255,255,255,255))
+		draw.RoundedBox(50222, -50222, -50222, 50222, 50222, Color(140, 0, 0, 100)) -- Draw Background Bar - health
+	cam.End3D2D()
+end
+concommand.Add("drawworldhud", DrawWorldHud)
